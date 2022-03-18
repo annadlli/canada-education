@@ -42,7 +42,7 @@ You can and should cross-reference sections and sub-sections. For instance, Sect
 
 # Data
 
-##Happinesss
+## Happinesss
 ```{r life, fig.cap = "Happiness", echo = FALSE}
 ca_gss |> 
   ggplot(aes(x= feelings_life)) +
@@ -74,7 +74,7 @@ ggplot(ca_gss, aes(x = education, fill = education)) +
 
 test 2 education : \@ref(fig:education)
 
-### Health: Majority Believe They Are Above Average For Health
+## Health: Majority Believe They Are Above Average For Health
 ```{r health, echo = FALSE, fig.cap = "Similar Trend for Mental and Physical Health" }
 health<- ggplot(ca_gss, aes(x = self_rated_health, fill = self_rated_health)) +
   geom_bar(alpha = 0.8) +
@@ -95,7 +95,7 @@ mental/ health + plot_annotation(
 
 trying health \@ref(fig:health)
 
-### Marital status
+## Marital status
 ```{r marital, echo = FALSE, fig.cap = "Majority do not want children"}
 ggplot(ca_gss, aes(number_total_children_intention, fill = marital_status))+
   geom_bar(position = "dodge")+
@@ -105,7 +105,7 @@ ggplot(ca_gss, aes(number_total_children_intention, fill = marital_status))+
 ```
 trying marriage \@ref(fig:marital)
 
-### Income
+## Income
 ```{r income, fig.cap = "Different trends of family and respondent income", echo = FALSE}
 family_income_graph <- ca_gss %>% ggplot(aes(x= income_family, fill = income_family)) +
   geom_bar() +
