@@ -1,0 +1,250 @@
+---
+title: "Canada GSS 2017"
+subtitle: ""
+author: 
+  - Anna Li and Mohammad Sardar Sheikh
+thanks: "Code and data are available at: https://github.com/annadlli/canada-education.git."
+date: "`r format(Sys.time(), '%d %B %Y')`"
+abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+output:
+  bookdown::pdf_document2
+toc: FALSE
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+library(ggplot2)
+library(plyr)
+library(patchwork)
+library(kableExtra)
+```
+
+```{r, include = FALSE}
+ca_gss<-read_csv("../../inputs/data/ca_gss.csv")
+#ensure everything is factor
+ca_gss$vis_minority<-as.factor(ca_gss$vis_minority)
+ca_gss$aboriginal<-as.factor(ca_gss$aboriginal)
+ca_gss$education<-as.factor(ca_gss$education)
+ca_gss$self_rated_health<-as.factor(ca_gss$self_rated_health)
+ca_gss$self_rated_mental_health<-as.factor(ca_gss$self_rated_mental_health)
+
+```
+
+# Introduction
+
+You can and should cross-reference sections and sub-sections. For instance, Section \@ref(data). R Markdown automatically makes the sections lower case and adds a dash to spaces to generate labels, for instance, Section \@ref(first-discussion-point). 
+
+@citeR
+
+
+# Data
+
+##Happinesss
+```{r life, fig.cap = "Happiness", echo = FALSE}
+ca_gss |> 
+  ggplot(aes(x= feelings_life)) +
+  geom_bar(color = "dark red", fill = "dark red") + 
+  scale_x_binned(n.breaks = 11) + 
+  labs(x = "Respondent General Happiness", y = "number of respondents", title = "General Happiness is Above Average") + 
+  theme_classic()
+
+```
+ 
+test 1 life: \@ref(fig:life)
+
+## Education: High school diploma, College, and Bachelor's Degree are Most Common
+```{r education, fig.cap = "Majority of Respondents have either a high school diploma, college degree, or bachelor's degree", echo = FALSE}
+#label each education level with their corersponding meaning
+levels(ca_gss$education) <-c("Less than high school", "High school diploma", 
+                             "College", "Trade certificate", 
+                             "University below bachelor", "Bachelor's degree", 
+                             "Above bachelor's degree")
+#create graph
+ggplot(ca_gss, aes(x = education, fill = education)) + 
+  geom_bar() + 
+  theme_classic() +
+  labs(x = "Level of Education", y = "Amount of Respondents", title = "2017 Canadian GSS Respondent's Education",
+       fill = "Level of Education")+
+   theme( axis.text.x = element_blank())
+
+```
+
+test 2 education : \@ref(fig:education)
+
+### Health: Majority Believe They Are Above Average For Health
+```{r health, echo = FALSE, fig.cap = "Similar Trend for Mental and Physical Health" }
+health<- ggplot(ca_gss, aes(x = self_rated_health, fill = self_rated_health)) +
+  geom_bar(alpha = 0.8) +
+  theme_classic() +
+  scale_fill_brewer(palette = "Reds") +
+  labs(x = "Physical Health Rating", y = "Number of Respondents", title = "Physical Health results", fill = "Physical Health Rating")
+
+mental<- ggplot(ca_gss, aes(x = self_rated_mental_health, fill = self_rated_mental_health)) +
+  geom_bar(alpha = 0.8) +
+  theme_classic() +
+  scale_fill_brewer(palette = "Greens")+
+  labs(x = "Mental Health Rating", y = "Number of Respondents", title = "Mental Health results", fill = "Mental Health Rating")
+mental/ health + plot_annotation(
+  title = "Respondent's Belief about Own Health (Physical & Mental)",
+  caption = "Self reported results"
+)
+```
+
+trying health \@ref(fig:health)
+
+### Marital status
+```{r marital, echo = FALSE, fig.cap = "Majority do not want children"}
+ggplot(ca_gss, aes(number_total_children_intention, fill = marital_status))+
+  geom_bar(position = "dodge")+
+  theme_classic() +
+  labs(x = "Number of Children Intention", y = "Amount of Respondents", title = "Marital Status versus Number of Children Desired", fill = "Marital Status")
+
+```
+trying marriage \@ref(fig:marital)
+
+### Income
+```{r income, fig.cap = "Different trends of family and respondent income", echo = FALSE}
+family_income_graph <- ca_gss %>% ggplot(aes(x= income_family, fill = income_family)) +
+  geom_bar() +
+  theme_minimal() + 
+  labs(x = "Income group",
+       y = "Number of respondents in the group", 
+       title = "Family's income") +
+   theme(axis.text.x = element_blank())
+ family_income_graph <- family_income_graph + scale_fill_discrete(name = "Income Group")
+
+
+   
+       
+respondant_income_graph <- ca_gss %>% ggplot(aes(x= income_respondent, fill = income_respondent)) +
+  geom_bar() +
+  theme_minimal() + 
+  labs(x = "Income group",
+       y = "Number of respondents in the group", title = "Respondent's income") + 
+  theme(legend.position = "none", axis.text.x = element_blank())
+  
+#gss_all %>%  filter(income_family == "4") %>% nrow() 
+#so we can see that most of the people earn a family income greater than $125,000
+
+(family_income_graph + respondant_income_graph)+plot_annotation(
+  title = "Comparison of Family and Respondent's Income",
+  caption = "Seems like rspondent's are not necessarily the main money earner within the family"
+)
+
+```
+trying income  \@ref(fig:income)
+
+
+
+### Summary Table: Equal Male and Female Respondents, Few of Aboriginal or Visible Minority Groups
+
+```{r summary, echo = FALSE}
+#raw observations table
+#generate observations
+minority<-t(ca_gss %>% dplyr::group_by(vis_minority) %>% dplyr::summarise(total = n()))
+minority<-minority[,c(3,2,1)]
+aboriginal<- (t(ca_gss %>% dplyr::group_by(aboriginal) %>% dplyr::summarise(total = n())))
+aboriginal<-aboriginal[,c(3,2,1)]
+
+
+is_male<-c(sum(ca_gss$is_male),nrow(ca_gss)-sum(ca_gss$is_male),0)
+is_aboriginal<-as.integer(aboriginal[2,])
+is_minority<-as.integer(minority[2,])
+
+#create table
+table2<-rbind(is_male, is_minority, is_aboriginal)
+row.names(table2) = c("Is Male?", "Is Visible Minority?", "Is Aboriginal?")
+colnames(table2) = c("Yes", "No", "Don't Know")
+table2 %>% kbl(booktabs = T, caption = "Number of Respondents by Sex and Race") %>% kable_styling()
+```
+\@ref(tab:summary)
+
+### Summary Table 2: Proportion of Visible Minority Respondents Similar to Aboriginal
+
+```{r persum, echo = FALSE}
+###percentage table
+#male/female
+male<- round(sum(ca_gss$is_male)/nrow(ca_gss),4)
+female<- round(1-male,4)
+is_male_ratio <- c(male, female, 0)
+
+#minority
+is_minority_ratio<-round(is_minority/nrow(ca_gss),4)
+is_aboriginal_ratio<-round(is_aboriginal/nrow(ca_gss),4)
+
+table3<-rbind(is_male_ratio,is_minority_ratio, is_aboriginal_ratio)
+row.names(table3) = c("Is Male?", "Is Visible Minority?", "Is Aboriginal?")
+colnames(table3) = c("Yes", "No", "Don't Know")
+table3 %>% kbl(booktabs = T, caption = "Proportion of Respondents by Sex and Race") %>% kable_styling()
+```
+
+\@ref(tab:persum)
+
+
+# Results
+
+
+# Discussion
+
+## First discussion point
+
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+
+## Second discussion point
+
+## Third discussion point
+
+## Weaknesses and next steps
+
+Weaknesses and next steps should also be included.
+
+\newpage
+
+\appendix
+
+# Appendix {-}
+
+
+# Supplementary survey
+
+Our supplementary survey is available here: LINK
+
+## Preamble
+
+The purpose of this survey is to further investigate gender. We are interested in more detailed gender data than is provided by the main US GSS and will use this to guide the development of submissions to change future iterations of the GSS.
+
+By proceeding with the survey, you understand that we will use your responses to better understand gender responses in the GSS. The survey is voluntary, and if you decide to participate you can skip questions and withdraw at any time.
+
+## Questions
+
+1. What is your age?
+    - 18-29
+    - ... ADD all the others
+2. What is your gender?
+    - Female
+    - Male
+    - Transgender
+    - Non-binary
+    - Genderqueer
+    - Two-spirit
+    - Other
+ADD some other questions
+
+## End page
+
+Thank you very much for partiicpating in our survey. If you have any questions, you can email rohan.alexander@utoronto.ca
+
+
+
+
+
+
+\newpage
+
+
+# References
+
+
