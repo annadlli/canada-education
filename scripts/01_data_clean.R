@@ -28,15 +28,13 @@
   ## 8. Select CSV data file, data definitions for STATA (gross, but stick with it for now).
   ## 9. Can select all variables by clicking button next to green colored "All". Then continue.
   ## 10. Create the files, download and save
-# Check: 
-  ## You WILL need to change the raw data name. Search for .csv - line 41
-  ## You may need to adjust the filepaths depending on your system. Search for: read_
 
 
 #### Workspace set-up ####
 library(janitor)
 library(tidyverse)
 
+#read raw CA GSS datafile
 readr::read_csv("AAWk5147.csv")
 
 # Load the data dictionary and the raw data and correct the variable names
