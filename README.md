@@ -10,6 +10,6 @@ This repository is organized as follows:
 
 Specific steps to access 2017 Canadian GSS include the following:
 1. Access CHASS at http://ww.chass.utoronto.ca/, login using credentials (University of Toronto)
-2. Choose SDA @ CHAss, choose language to access database of all microdata surveys available. 
+2. Choose SDA @ CHASS, choose language to access database of all microdata surveys available. 
 3. Find 2017 Canadian GSS, click data and download specifically 3 files: CSV data file, data definitions for STATA, and codebook. All variables should be selected.
 4. Save locally
